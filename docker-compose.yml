@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: cashflow-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-cashflow}
+      MYSQL_USER: ${MYSQL_USER:-cashflow}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-cashflowpassword}
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    container_name: cashflow-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      DATABASE_URL: mysql://${MYSQL_USER:-cashflow}:${MYSQL_PASSWORD:-cashflowpassword}@mysql:3306/${MYSQL_DATABASE:-cashflow}
+      JWT_SECRET: ${JWT_SECRET:-change-this-secret-in-production}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-7d}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_WEBHOOK_URL: ${TELEGRAM_WEBHOOK_URL:-}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+    ports:
+      - '3001:3001'
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    container_name: cashflow-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:3001/api}
+    ports:
+      - '5173:80'
+
+volumes:
+  mysql_data:

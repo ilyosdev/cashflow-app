@@ -20,7 +20,33 @@ A full-featured monorepo application for tracking client subscriptions, payments
 - **Monorepo**: pnpm Workspaces
 - **Notifications**: Telegram Bot API
 
-## Getting Started
+## Quick Start with Docker
+
+The easiest way to run the application:
+
+```bash
+# 1. Copy environment file
+cp .env.example .env
+
+# 2. Edit .env with your settings (especially JWT_SECRET and TELEGRAM_BOT_TOKEN)
+
+# 3. Start everything
+docker-compose up -d
+
+# 4. Access the app
+# Frontend: http://localhost:5173
+# Backend API: http://localhost:3001
+# Login: admin / admin123
+```
+
+**What happens automatically:**
+
+- ✅ MySQL database created
+- ✅ Database migrations run
+- ✅ Admin user seeded
+- ✅ Backend and frontend started
+
+## Getting Started (Manual)
 
 ### Prerequisites
 
@@ -31,16 +57,19 @@ A full-featured monorepo application for tracking client subscriptions, payments
 ### Installation
 
 1. Install dependencies:
+
 ```bash
 pnpm install
 ```
 
 2. Set up environment variables:
+
 ```bash
 cp apps/backend/.env.example apps/backend/.env
 ```
 
 Edit `apps/backend/.env`:
+
 ```env
 DATABASE_URL=mysql://root:password@localhost:3306/subscriptions
 JWT_SECRET=your-secret-key-here
@@ -49,11 +78,13 @@ FRONTEND_URL=http://localhost:5173
 ```
 
 3. Create MySQL database:
+
 ```sql
 CREATE DATABASE subscriptions;
 ```
 
 4. Run database migrations:
+
 ```bash
 cd apps/backend
 pnpm db:generate
@@ -61,27 +92,32 @@ pnpm db:migrate
 ```
 
 5. Seed admin user:
+
 ```bash
 npx ts-node seed.ts
 ```
 
 Default credentials:
+
 - Username: `admin`
 - Password: `admin123`
 
 6. Start development servers:
 
 Terminal 1 - Backend:
+
 ```bash
 pnpm dev:backend
 ```
 
 Terminal 2 - Frontend:
+
 ```bash
 pnpm dev:frontend
 ```
 
 7. Access the application:
+
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:3001
 
@@ -123,10 +159,12 @@ subscriptions/
 ## API Endpoints
 
 ### Authentication
+
 - `POST /api/auth/login` - Login
 - `GET /api/auth/me` - Get current user
 
 ### Clients
+
 - `GET /api/clients` - List clients
 - `GET /api/clients/:id` - Get client
 - `POST /api/clients` - Create client
@@ -134,6 +172,7 @@ subscriptions/
 - `DELETE /api/clients/:id` - Delete client
 
 ### Subscriptions
+
 - `GET /api/subscriptions` - List subscriptions
 - `GET /api/subscriptions/:id` - Get subscription
 - `POST /api/subscriptions` - Create subscription
@@ -141,6 +180,7 @@ subscriptions/
 - `DELETE /api/subscriptions/:id` - Delete subscription
 
 ### Payments
+
 - `GET /api/payments` - List payments
 - `GET /api/payments/:id` - Get payment
 - `POST /api/payments` - Create payment
@@ -148,6 +188,7 @@ subscriptions/
 - `DELETE /api/payments/:id` - Delete payment
 
 ### Expenses
+
 - `GET /api/expenses` - List expenses
 - `GET /api/expenses/:id` - Get expense
 - `POST /api/expenses` - Create expense
@@ -155,18 +196,21 @@ subscriptions/
 - `DELETE /api/expenses/:id` - Delete expense
 
 ### Exchange Rates
+
 - `GET /api/exchange-rates` - List rates
 - `POST /api/exchange-rates` - Create rate
 - `PUT /api/exchange-rates/:id` - Update rate
 - `DELETE /api/exchange-rates/:id` - Delete rate
 
 ### Dashboard & Reports
+
 - `GET /api/dashboard/metrics` - Get dashboard metrics
 - `GET /api/reports/revenue` - Revenue report
 - `GET /api/reports/expenses` - Expense report
 - `GET /api/reports/cash-flow` - Cash flow report
 
 ### Telegram
+
 - `POST /api/telegram/webhook` - Telegram webhook endpoint
 - `GET /api/telegram/connect` - Get connection instructions
 
@@ -201,12 +245,14 @@ pnpm build:frontend
 See [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md) for complete deployment instructions.
 
 The application is designed for Railway deployment with:
+
 - MySQL database service
 - NestJS backend service
 - Static frontend deployment
 - Telegram webhook configuration
 
 Quick summary:
+
 1. Push repository to GitHub
 2. Deploy MySQL database to Railway
 3. Deploy backend with environment variables
